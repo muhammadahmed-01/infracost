@@ -1,0 +1,21 @@
+name: FinOps Guardrail Validation
+
+on: [pull_request, push]
+
+jobs:
+  guardrail-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Infracost
+        uses: infracost/actions/setup@v3
+        with:
+          api-key: ${{ secrets.INFRACOST_API_KEY }} # Make sure this is in GitHub Secrets!
+
+      - name: Generate Infracost JSON
+        run: infracost breakdown --path . --format json --out-file report.json
+
+      - name: Run Minimal Guardrail
+        run: ./guardrail-linux
